@@ -26,7 +26,7 @@ public class OutLog extends Thread {
 	// The date format should be: yyyy_MM_dd_hh_mm for testing.
 	public String getFileName() {
 		Date nd = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy_MM_dd_hh_mm");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		return "log_" + df.format(nd) + ".log";
 	}
 	
@@ -106,7 +106,14 @@ public class OutLog extends Thread {
 	
 	// Use this to kill the external process
 	public void killProcess() {
-		p.destroy();
+		try {
+			if (p != null) {
+				p.destroy();
+			}
+		}
+		catch(NullPointerException npe) {
+			System.out.println(npe.getMessage());
+		}
 	}
 	
 	// Return the output counter for the main thread to monitor.
