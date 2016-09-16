@@ -13,13 +13,17 @@ import java.text.*;
 // output into a file, and allows for the monitoring and control
 // of that external process.
 public class OutLog extends Thread {
-
+	
 	// The command to be run as an external process.
 	public String cmd;
 	// The counter to be monitored by the parent thread.
 	public int counter;
+	// Hold the old count
+	public int old_count;
 	// The external process.
 	public Process p;
+	// Need to write from multiple methods
+	protected OutputStream out = null;
 	
 	// Builds a log file name based on the time/date.
 	// The date format should be: yyyy_MM_dd for daily log files.
@@ -30,13 +34,12 @@ public class OutLog extends Thread {
 		return "log_" + df.format(nd) + ".log";
 	}
 	
-	// This process contails the logic for passing process output to a file.
+	// This process contains the logic for passing process output to a file.
 	// The command is accessed from with the argument, accepted by the constructor.
 	public void run() {
 		try {
 			String line;
 			String filename = "";
-			OutputStream out = null;
 			boolean isOpen = false;
 			
 			// You have to have a command to do anything.
@@ -74,8 +77,7 @@ public class OutLog extends Thread {
 				line += "\n";
 				
 				// Write to the file
-				out.write(line.getBytes(Charset.forName("UTF-8")));
-				out.flush();
+				writeOut(line);
 				
 				// Upping the count so the main thread will know the output is still
 				// running.
@@ -95,7 +97,16 @@ public class OutLog extends Thread {
 		catch (Exception err) {
 			// Display the exception.
 			System.out.println(err.getMessage());
-			
+		}
+	}
+	
+	protected void writeOut(String msg) {
+		try {
+			out.write(msg.getBytes(Charset.forName("UTF-8")));
+			out.flush();
+		}
+		catch(Exception err) {
+			System.out.println(err.getMessage());
 		}
 	}
 	
@@ -108,6 +119,7 @@ public class OutLog extends Thread {
 	public void killProcess() {
 		try {
 			if (p != null) {
+				writeOut("Restarting. Last line count: "+old_count+"\n");
 				p.destroy();
 			}
 		}
@@ -123,6 +135,11 @@ public class OutLog extends Thread {
 	
 	// Allow external operators to reset the counter.
 	public void resetCounter() {
+		// Save the count
+		old_count = counter;
+		// Log the count
+		writeOut("Line count: "+counter+"\n");
+		// Now we reset the count
 		counter = 0;
 	}
 }

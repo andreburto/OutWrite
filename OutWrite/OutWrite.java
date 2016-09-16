@@ -2,7 +2,12 @@ package OutWrite;
 
 public class OutWrite {
 
+	// The OutLog class that manages the log
 	public static OutLog ol;
+	// Wait between checks
+	private static int LOOP_WAIT_MILLIS = 300000;
+	// Wait from the start up.
+	private static int STRT_WAIT_MILLIS = 60000;
 	
 	// Saving a few lines by not having an exception for every Thread.sleep
 	// called in the program.
@@ -38,23 +43,22 @@ public class OutWrite {
 			
 			ol.start();
 			
-			// Sleep for one second to ive the thread a moment to get
+			// Sleep for one second to give the thread a moment to get
 			// started running.
-			olSleep(1000);
+			olSleep(STRT_WAIT_MILLIS);
 						
 			// Check for output continuously.
 			while(ol.getCounter() > 0) {
 				ol.resetCounter();
 				
 				// Wait ten seconds before checking for more output.
-				olSleep(10000);
+				olSleep(LOOP_WAIT_MILLIS);
 			}
 			
 			// End the external process, stop the thread, clear the instantiated
 			// object OutLog.
 			ol.killProcess();
 			ol.interrupt();
-			ol = null;
 		}
 	}
 }
