@@ -119,7 +119,7 @@ public class OutLog extends Thread {
 	public void killProcess() {
 		try {
 			if (p != null) {
-				writeOut("Restarting. Last line count: "+old_count+"\n");
+				writeOut("Restarting. Last line count: "+old_count+"\n\n");
 				p.destroy();
 			}
 		}
