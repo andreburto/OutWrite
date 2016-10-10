@@ -29,6 +29,16 @@ public class OutWrite {
 	public static void main(String[] args) {
 		String command = getCommand(args);
 		
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				ol.killProcess();
+				ol.interrupt();
+			}
+		}));
+		
 		// This loop will run forever. Ctrl+C must be invoked to stop
 		// OutWrite from running. You will need to check the TaskManager
 		// or Process List to stop the external process if you force a stop.
